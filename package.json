@@ -1,5 +1,5 @@
 {
-  "name": "typescript-action",
+  "name": "dependent-jobs-result-check",
   "version": "0.0.0",
   "private": true,
   "description": "TypeScript template action",
@@ -11,7 +11,9 @@
     "lint": "eslint src/**/*.ts",
     "package": "ncc build --source-map --license licenses.txt",
     "test": "jest",
-    "all": "npm run build && npm run format && npm run lint && npm run package && npm test"
+    "all": "npm run build && npm run format && npm run lint && npm run package && npm test",
+    "commit": "git add . && git commit -am 'chore: add dist action'",
+    "push": "git push --follow-tags"
   },
   "repository": {
     "type": "git",
@@ -22,7 +24,7 @@
     "node",
     "setup"
   ],
-  "author": "",
+  "author": "Layton Whiteley",
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.6.0"

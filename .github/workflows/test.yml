@@ -36,6 +36,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ./
+        id: check_statuses 
         with:
           statuses: failure,cancelled,skipped,success
           dependencies: ${{toJSON(needs)}}
+      - name: log output
+        run: |
+         echo "statuses:" "${{ steps.check_statuses.outputs.statuses }}"
+         echo "jobs:" "${{ steps.check_statuses.outputs.jobs }}"
+         echo "found any?:" "${{ steps.check_statuses.outputs.found }}"
