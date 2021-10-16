@@ -1,21 +1,25 @@
 import * as core from '@actions/core';
-// import * as github from '@actions/github';
-import {wait} from './wait';
+import {checkDependencies} from './check-dependencies';
 
 (async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds');
-    const dependencies: string = core.getInput('dependencies');
-    core.debug(`Waiting ${ms} milliseconds ...`); // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
+    const statuses: string = core.getInput('statuses');
+    const dependencies = JSON.parse(core.getInput('dependencies'));
+    if (!dependencies) {
+      throw new Error('Could not read dependencies');
+    }
+    const report = checkDependencies({dependencies, statuses});
 
-    core.info(dependencies);
+    core.info(`report:\n ${JSON.stringify(report, null, 2)}`);
 
-    core.debug(new Date().toTimeString());
-    await wait(parseInt(ms, 10));
-    core.debug(new Date().toTimeString());
+    const found = !!report.results.length;
 
-    core.setOutput('time', new Date().toTimeString());
+    core.setOutput('found', found.toString());
+    core.setOutput('jobs', report.jobs.join(','));
+    core.setOutput('statuses', report.statuses.join(','));
   } catch (error) {
-    if (error instanceof Error) core.setFailed(error.message);
+    if (error instanceof Error) {
+      core.setFailed(error.message);
+    }
   }
 })();

@@ -1,6 +1,34 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 213:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.checkDependencies = void 0;
+function checkDependencies({ statuses, dependencies }) {
+    const results = Object.entries(dependencies)
+        .map(([jobId, { result }]) => {
+        if (!statuses.includes(result)) {
+            return undefined;
+        }
+        return {
+            jobId,
+            status: result,
+        };
+    })
+        .filter(Boolean);
+    const statusesFound = results.map(({ status }) => status);
+    const jobs = results.map(({ jobId }) => jobId);
+    return { results, statuses: statusesFound, jobs };
+}
+exports.checkDependencies = checkDependencies;
+
+
+/***/ }),
+
 /***/ 109:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -36,57 +64,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(186));
-// import * as github from '@actions/github';
-const wait_1 = __nccwpck_require__(817);
+const check_dependencies_1 = __nccwpck_require__(213);
 (function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const ms = core.getInput('milliseconds');
-            const dependencies = core.getInput('dependencies');
-            core.debug(`Waiting ${ms} milliseconds ...`); // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
-            core.info(dependencies);
-            core.debug(new Date().toTimeString());
-            yield (0, wait_1.wait)(parseInt(ms, 10));
-            core.debug(new Date().toTimeString());
-            core.setOutput('time', new Date().toTimeString());
+            const statuses = core.getInput('statuses');
+            const dependencies = JSON.parse(core.getInput('dependencies'));
+            if (!dependencies) {
+                throw new Error('Could not read dependencies');
+            }
+            const report = (0, check_dependencies_1.checkDependencies)({ dependencies, statuses });
+            core.info(`report:\n ${JSON.stringify(report, null, 2)}`);
+            const found = !!report.results.length;
+            core.setOutput('found', found.toString());
+            core.setOutput('jobs', report.jobs.join(','));
+            core.setOutput('statuses', report.statuses.join(','));
         }
         catch (error) {
-            if (error instanceof Error)
+            if (error instanceof Error) {
                 core.setFailed(error.message);
+            }
         }
     });
 })();
-
-
-/***/ }),
-
-/***/ 817:
-/***/ (function(__unused_webpack_module, exports) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.wait = void 0;
-function wait(milliseconds) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return new Promise(resolve => {
-            if (isNaN(milliseconds)) {
-                throw new Error('milliseconds not a number');
-            }
-            setTimeout(() => resolve('done!'), milliseconds);
-        });
-    });
-}
-exports.wait = wait;
 
 
 /***/ }),

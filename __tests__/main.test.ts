@@ -1,29 +1,50 @@
-import {wait} from '../src/wait';
-import * as process from 'process';
-import * as cp from 'child_process';
-import * as path from 'path';
+import {checkDependencies} from '../src/check-dependencies';
 import {expect, test} from '@jest/globals';
 
-test('throws invalid number', async () => {
-  const input = parseInt('foo', 10);
-  await expect(wait(input)).rejects.toThrow('milliseconds not a number');
+test('should return empty report when input empty', () => {
+  const input = {statuses: '', dependencies: {}};
+  expect(checkDependencies(input)).toEqual({
+    jobs: [],
+    results: [],
+    statuses: [],
+  });
 });
 
-test('wait 500 ms', async () => {
-  const start = new Date();
-  await wait(500);
-  const end = new Date();
-  var delta = Math.abs(end.getTime() - start.getTime());
-  expect(delta).toBeGreaterThan(450);
+test('should return empty report when statuses empty', () => {
+  const input = {statuses: '', dependencies: {build: {result: 'success'}}};
+  expect(checkDependencies(input)).toEqual({
+    jobs: [],
+    results: [],
+    statuses: [],
+  });
 });
 
-// shows how the runner will run a javascript action with env / stdout protocol
-test('test runs', () => {
-  process.env['INPUT_MILLISECONDS'] = '500';
-  const np = process.execPath;
-  const ip = path.join(__dirname, '..', 'lib', 'main.js');
-  const options: cp.ExecFileSyncOptions = {
-    env: process.env,
+test('should return filled report when statuses and dependencies are as expected', () => {
+  const input = {
+    statuses: 'success,failure,skipped,cancelled',
+    dependencies: {build: {result: 'success'}},
   };
-  console.log(cp.execFileSync(np, [ip], options).toString());
+  expect(checkDependencies(input)).toEqual({
+    jobs: ['build'],
+    results: [{jobId: 'build', status: 'success'}],
+    statuses: ['success'],
+  });
+});
+
+test('should return filled report when statuses and multi dependencies are as expected', () => {
+  const input = {
+    statuses: 'success,failure,skipped,cancelled',
+    dependencies: {
+      build: {result: 'success'},
+      build_extra: {result: 'failure'},
+    },
+  };
+  expect(checkDependencies(input)).toEqual({
+    jobs: ['build', 'build_extra'],
+    results: [
+      {jobId: 'build', status: 'success'},
+      {jobId: 'build_extra', status: 'failure'},
+    ],
+    statuses: ['success', 'failure'],
+  });
 });

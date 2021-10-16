@@ -1,14 +1,23 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'dependent jobs result check'
+description: 'Checks if dependent jobs result matches provided statuses'
+branding:
+  icon: 'bell'
+  color: 'green'
+author: 'Layton Whiteley'
 inputs:
-  milliseconds: # change this
+  statuses:
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
-  dependencies: # change this
+    description: 'comma seperated list of statuses to check'
+  dependencies:
     required: true
     description: 'json string of dependencies'
+outputs:
+  statuses: 
+    description: 'statuses found for jobs that match provided statuses'
+  jobs: 
+    description: 'comma list of jobs that included the provided statuses'
+  found: 
+    description: 'boolean of whether the provided statuses were found'
 runs:
   using: 'node12'
   main: 'dist/index.js'
