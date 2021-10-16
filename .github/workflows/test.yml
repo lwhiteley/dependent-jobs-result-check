@@ -41,6 +41,7 @@ jobs:
           statuses: failure,cancelled,skipped,success
           dependencies: ${{toJSON(needs)}}
       - name: log output
+        if: fromJSON(steps.check_statuses.outputs.found)
         run: |
          echo "statuses:" "${{ steps.check_statuses.outputs.statuses }}"
          echo "jobs:" "${{ steps.check_statuses.outputs.jobs }}"
