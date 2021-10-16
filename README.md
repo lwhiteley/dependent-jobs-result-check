@@ -21,9 +21,9 @@ main-completion-status:
         dependencies: ${{toJSON(needs)}}
     - name: log output
       run: |
-        echo "statuses:" "${{ steps.check_statuses.outputs.statuses }}"
-        echo "jobs:" "${{ steps.check_statuses.outputs.jobs }}"
-        echo "found any?:" "${{ steps.check_statuses.outputs.found }}"
+        echo "statuses:" "${{ steps.check_statuses.outputs.statuses }}" # comma list of matching statuses
+        echo "jobs:" "${{ steps.check_statuses.outputs.jobs }}" # comma list of jobs with matching statuses
+        echo "found any?:" "${{ steps.check_statuses.outputs.found }}" # boolean if any statuses were found or not
     - name: consider failing build
       if: fromJSON(steps.check_statuses.outputs.found)
       run: |
