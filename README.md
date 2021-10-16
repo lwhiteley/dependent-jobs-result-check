@@ -16,6 +16,7 @@ main-completion-status:
   if: always()
   steps:
     - uses: lwhiteley/dependent-jobs-result-check@v1
+      id: check_statuses
       with:
         statuses: failure,cancelled # valid options: failure,cancelled,skipped,success
         dependencies: ${{toJSON(needs)}}
