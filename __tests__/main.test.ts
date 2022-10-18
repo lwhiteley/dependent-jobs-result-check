@@ -1,5 +1,5 @@
-import {checkDependencies} from '../src/check-dependencies';
 import {expect, test} from '@jest/globals';
+import {checkDependencies} from '../src/check-dependencies';
 
 test('should return empty report when input empty', () => {
   const input = {statuses: '', dependencies: {}};
