@@ -36,6 +36,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store
 
+      - name: Install Dependencies
+        run: |
+          pnpm i
+
       - name: Build
         run: |
           pnpm all
