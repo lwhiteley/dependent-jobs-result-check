@@ -19,5 +19,5 @@ outputs:
   found: 
     description: 'boolean of whether the provided statuses were found'
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'dist/index.js'

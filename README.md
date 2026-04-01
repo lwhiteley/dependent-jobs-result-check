@@ -15,7 +15,7 @@ main-completion-status:
   needs: [required_build_1, required_build_2, required_build_3]
   if: always()
   steps:
-    - uses: lwhiteley/dependent-jobs-result-check@v1
+    - uses: lwhiteley/dependent-jobs-result-check@v4
       id: check_statuses
       with:
         statuses: failure,cancelled # valid options: failure,cancelled,skipped,success
